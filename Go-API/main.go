@@ -13,14 +13,18 @@ type book struct{
 	Quantity int	`json: "quantity"`
 }
 
-//mock database
+//mock data is this slice of books (will be a database in a real life example)
 var books = []book{
 				{ID: "1",  Title: "In Search of Lost Time", Author: "Marcel Proust", Quantity: 2},
 				{ID: "2",  Title: "The Great Gatsby", Author: "F. Scott Fitzgerald", Quantity: 5},
 				{ID: "3",  Title: "War And Peace", Author: "Leo Tolstoy", Quantity: 6},
 }
 
-//set up router to handle main end points of api
+
+
+
+
+//set up router to handle main end points of api by implementing the book handling functions first:
 
 
 //getting all the books
@@ -29,10 +33,7 @@ func getBooks(c*gin.Context){
 }
 
 
-
 //returning a specic book
-
-
 func bookById(c *gin.Context) {
 	id := c.Param("id")
 	book, err := getBookById(id)
@@ -41,25 +42,19 @@ func bookById(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Book not found."}) //return custom request for bad request or book not found
 		return
 	}
-
 	c.IndentedJSON(http.StatusOK, book)
 }
 
 
-
+//gettting a book by id
 func getBookById(id string) (*book, error) {
 	for i, b := range books {
 		if b.ID == id {
 			return &books[i], nil
 		}
 	}
-
 	return nil, errors.New("book not found")
-
 }
-
-
-
 
 
 //creating a new book
@@ -79,13 +74,18 @@ func createBook(c*gin.Context){ //c stores query parameters, headers
 
 
 
+
+
+
 func main(){
-	router := gin.Default()  //create a gin router
+
+	//create a gin router
+	//can route a specific route to a function with router variable
+	router := gin.Default()
+
 
 	//return all books
 	router.GET("/books", getBooks)   //when visting the /books endpoint the getbooks function is called
-
-	//can route a specific route to a function with router variable
 
 
 	//return a specific book
@@ -96,9 +96,7 @@ func main(){
 	router.POST("/books", createBook)
 
 
-
-
-	router.Run("localhost:8080")   //hte server and port we are running the web server on
-
+	//run the api ona  specific IP (in this case local host) and port (we have chose port 8000)
+	router.Run("localhost:8080")
 
 }
