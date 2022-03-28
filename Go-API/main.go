@@ -46,7 +46,7 @@ func bookById(c *gin.Context) {
 }
 
 
-//gettting a book by id
+//getting a book by id
 func getBookById(id string) (*book, error) {
 	for i, b := range books {
 		if b.ID == id {
@@ -54,6 +54,33 @@ func getBookById(id string) (*book, error) {
 		}
 	}
 	return nil, errors.New("book not found")
+}
+
+//* symbol is used to declare a pointer and to dereference, as well as changing the value of the pointer location as well  & symbol points to the address of the stored value.
+
+//checking out a specific book
+func checkoutBook(c*gin.Context){
+	id, ok := c.GetQuery("id") //chech query parameter in the path built in function in gin framework
+
+	if !ok{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "missing id query parameter"})
+		return
+	}
+	book, err := getBookById(id)
+
+	if err != nil{
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Book not found."}) //return custom request for bad request or book not found
+		return
+	}
+
+	if book.Quantity <= 0{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Book not available."}) //return custom request for bad request or book not found
+		return
+	}
+
+	book.Quantity -= 1
+	c.IndentedJSON(http.StatusOK, book)
+
 }
 
 
@@ -94,6 +121,10 @@ func main(){
 
 	//create a book:
 	router.POST("/books", createBook)
+
+
+	//checkout a book
+	router.PATCH("/checkout", checkoutBook)
 
 
 	//run the api ona  specific IP (in this case local host) and port (we have chose port 8000)
