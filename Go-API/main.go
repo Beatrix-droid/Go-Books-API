@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	//"errors"
+	"errors"
 )
 
 type book struct{
@@ -23,11 +23,46 @@ var books = []book{
 //set up router to handle main end points of api
 
 
-
+//getting all the books
 func getBooks(c*gin.Context){
 		c.IndentedJSON(http.StatusOK, books)   //nicely indented json, the status that we are sending is status okay, the data that we are sending is "books". So we return a json obejct that has all of the books in it
 }
 
+
+
+//returning a specic book
+
+
+func bookById(c *gin.Context) {
+	id := c.Param("id")
+	book, err := getBookById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Book not found."}) //return custom request for bad request or book not found
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, book)
+}
+
+
+
+func getBookById(id string) (*book, error) {
+	for i, b := range books {
+		if b.ID == id {
+			return &books[i], nil
+		}
+	}
+
+	return nil, errors.New("book not found")
+
+}
+
+
+
+
+
+//creating a new book
 func createBook(c*gin.Context){ //c stores query parameters, headers
 
 	var newBook book   	// the new book is of type book
@@ -46,9 +81,15 @@ func createBook(c*gin.Context){ //c stores query parameters, headers
 
 func main(){
 	router := gin.Default()  //create a gin router
+
+	//return all books
 	router.GET("/books", getBooks)   //when visting the /books endpoint the getbooks function is called
 
 	//can route a specific route to a function with router variable
+
+
+	//return a specific book
+	router.GET("/books/:id", bookById)
 
 
 	//create a book:
@@ -61,6 +102,3 @@ func main(){
 
 
 }
-
-
-//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
