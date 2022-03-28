@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"errors"
+	//"errors"
 )
 
 type book struct{
@@ -25,9 +25,7 @@ var books = []book{{
 
 
 func getBooks(c*gin.Context){
-		c.IndentedJson(http.StatusOK, books)   //nicely indented json, the status that we are sending is status okay, the data that we are sending is "books". So we return a json obejct that has all of the books in it
-		router.GET("/books", getBooks)   //when visting the /books endpoint the getbooks function is called
-		router.Run("localhost:8080")   //hte server and port we are running the web server on
+		c.IndentedJSON(http.StatusOK, books)   //nicely indented json, the status that we are sending is status okay, the data that we are sending is "books". So we return a json obejct that has all of the books in it
 
 }
 
@@ -35,8 +33,14 @@ func getBooks(c*gin.Context){
 
 func main(){
 	router := gin.Default()  //create a gin router
+	router.GET("/books", getBooks)   //when visting the /books endpoint the getbooks function is called
+	router.Run("localhost:8080")   //hte server and port we are running the web server on
+
 	//can route a specific route to a function with router variable
 
 
 
 }
+
+
+//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
