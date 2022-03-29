@@ -59,13 +59,14 @@ func getBookById(id string) (*book, error) {
 //* symbol is used to declare a pointer and to dereference, as well as changing the value of the pointer location as well  & symbol points to the address of the stored value.
 
 //checking out a specific book
-func checkoutBook(c*gin.Context){
+func checkoutBook(c *gin.Context){
 	id, ok := c.GetQuery("id") //chech query parameter in the path built in function in gin framework
 
 	if !ok{
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "missing id query parameter"})
 		return
 	}
+
 	book, err := getBookById(id)
 
 	if err != nil{
@@ -84,6 +85,30 @@ func checkoutBook(c*gin.Context){
 }
 
 
+func returnBook(c *gin.Context){
+
+	id, ok := c.GetQuery("id") //chech query parameter in the path built in function in gin framework
+
+	if !ok{
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "missing id query parameter"})
+		return
+	}
+
+	book, err := getBookById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Book not found."})
+		return
+	}
+
+	book.Quantity += 1
+	c.IndentedJSON(http.StatusOK, book)
+
+}
+
+
+
+
 //creating a new book
 func createBook(c*gin.Context){ //c stores query parameters, headers
 
@@ -91,9 +116,9 @@ func createBook(c*gin.Context){ //c stores query parameters, headers
 
 	if err := c.BindJSON(&newBook); err != nil{
 
-			 // if the error is not equal to null, in that case we shall simpy retur
-				return
-			}
+			// if the error is not equal to null, in that case we shall simpy return
+			return
+		}
 
 	books = append(books, newBook)
 	c.IndentedJSON(http.StatusCreated, newBook)
@@ -126,8 +151,11 @@ func main(){
 	//checkout a book
 	router.PATCH("/checkout", checkoutBook)
 
+	//checking in a book
+	router.PATCH("/checkin", returnBook)
 
-	//run the api ona  specific IP (in this case local host) and port (we have chose port 8000)
+
+	//run the api ona  specific IP (in this case local host) and port (we have chose port 8080)
 	router.Run("localhost:8080")
 
 }
